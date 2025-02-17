@@ -1,5 +1,19 @@
 // src/assets.rs
 
+pub struct Image {
+    pub path: &'static str,
+    pub width: f32,
+    pub height: f32,
+}
+
+// ==========================
+// Dimensions
+// ==========================
+pub const SCREEN_WIDTH: f32 = 640.0;
+pub const SCREEN_HEIGHT: f32 = 480.0;
+pub const PLAYER_SIZE_X: f32 = 34.0;
+pub const PLAYER_SIZE_Y: f32 = 50.0;
+
 // ==========================
 // Maps and Backgrounds
 // ==========================
@@ -7,48 +21,46 @@ pub const MAP_BOSS1: &str = "./img/mapa1.png";
 pub const MAP_BOSS2: &str = "./img/mapa2.png";
 pub const MAP_BOSS3: &str = "./img/mapa3.png";
 pub const MAP_BOSS4: &str = "./img/mapa4.png";
-pub const MAP_BOSS4_2: &str = "./img/mapaB.png";
-
-// ==========================
-// General Messages
-// ==========================
-pub const WELCOME_MESSAGE: &str = "Press Enter to start..";
+pub const MAP_BOSS4_B: &str = "./img/mapa4_b.png";
 
 // ==========================
 // Player Images
 // ==========================
 pub const PLAYER_HEART_IMAGE: &str = "./img/heart.png";
-pub const PLAYER_IMAGE_FRONT1: &str = "./img/baldr/front1.png";
-pub const PLAYER_IMAGE_BACK1: &str = "./img/baldr/back1.png";
-pub const PLAYER_IMAGE_LEFT1: &str = "./img/baldr/left1.png";
-pub const PLAYER_IMAGE_RIGHT1: &str = "./img/baldr/right1.png";
-pub const PLAYER_IMAGE_FRONT2: &str = "./img/baldr/front2.png";
-pub const PLAYER_IMAGE_BACK2: &str = "./img/baldr/back2.png";
-pub const PLAYER_IMAGE_LEFT2: &str = "./img/baldr/left2.png";
-pub const PLAYER_IMAGE_RIGHT2: &str = "./img/baldr/right2.png";
+pub const PLAYER_IMAGE_FRONT1: &str = "./img/player/front1.png";
+pub const PLAYER_IMAGE_FRONT2: &str = "./img/player/front2.png";
+pub const PLAYER_IMAGE_BACK1: &str = "./img/player/back1.png";
+pub const PLAYER_IMAGE_BACK2: &str = "./img/player/back2.png";
+pub const PLAYER_IMAGE_LEFT1: &str = "./img/player/left1.png";
+pub const PLAYER_IMAGE_LEFT2: &str = "./img/player/left2.png";
+pub const PLAYER_IMAGE_RIGHT1: &str = "./img/player/right1.png";
+pub const PLAYER_IMAGE_RIGHT2: &str = "./img/player/right2.png";
 
 // ==========================
 // Boss Images
 // ==========================
-pub const PLAYER_IMAGE_TREE: &str = "./img/arbol.png";
+pub const BOSS1_IMAGE: &str = "./img/boss1/boss1.png";
+pub const BOSS1_B_IMAGE: &str = "./img/boss1/boss1_b.png";
+pub const BOSS2_IMAGE: &str = "./img/boss2/boss2.png";
+pub const BOSS2_B_IMAGE: &str = "./img/boss2/boss2_b.png";
+pub const BOSS3_IMAGE: &str = "./img/boss3/boss3.png";
+pub const BOSS3_B_IMAGE: &str = "./img/boss3/boss3_b.png";
+pub const BOSS4_IMAGE: &str = "./img/boss4/boss4.png";
+pub const BOSS4_B_IMAGE: &str = "./img/boss4/boss4_b.png";
 pub const PLAYER_IMAGE_TREE2: &str = "./img/arbol2.png";
-pub const PLAYER_IMAGE_SNAKE1: &str = "./img/serpiente1.png";
 pub const PLAYER_IMAGE_SNAKE2: &str = "./img/serpiente2.png";
-pub const PLAYER_IMAGE_SNAKE1_SHOT: &str = "./img/serpiente1Bola.png";
 pub const PLAYER_IMAGE_SNAKE2_SHOT: &str = "./img/serpiente2Bola.png";
 
 // ==========================
-// Boss Images and Shots
+// Shots and Weapons
 // ==========================
-pub const SHOT_IMAGE: &str = "./img/bala.png";
-pub const SHOT_BOSS1: &str = "./img/bolaArbola.png";
-pub const SHOT_BOSS4: &str = "./img/bolaSua.png";
-pub const BOSS_IMAGE_OCTOPUS: &str = "./img/pulpo.png";
-pub const BOSS_IMAGE_OCTOPUS2: &str = "./img/pulpo2.png";
-pub const WEAPON_IMAGE_OCTOPUS: &str = "./img/bolaPinchos.png";
-pub const WEAPON_IMAGE_OCTOPUS2: &str = "./img/bolaDmg.png";
-pub const SHOT_IMAGE_BOSS: &str = "./img/bolaSua.png";
-pub const BOSS2_IMAGE: &str = "./img/Boss2b.png";
+pub const PLAYER_SHOT: &str = "./img/player_shot.png";
+pub const BOSS1_SHOT: &str = "./img/boss1/boss1_shot.png";
+pub const BOSS2_SHOT: &str = "./img/boss2/boss2_shot.png";
+pub const BOSS4_SHOT: &str = "./img/boss4_shot.png";
+pub const BOSS3_WEAPON: &str = "./img/boss3/boss3_weapon.png";
+pub const BOSS3_B_SHOT: &str = "./img/bolaDmg.png";
+pub const PLAYER_SHOT_BOSS: &str = "./img/bolaSua.png";
 pub const BOSS_IMAGE: &str = "./img/Boss.png";
 pub const BOSS_RIGHT_IMAGE: &str = "./img/bossb.png";
 pub const BOSS_RIGHT2_IMAGE: &str = "./img/Boss2.png";
@@ -175,6 +187,5 @@ pub const DIALOGUE_TITAN2_16: &str = "./img/titan2/16.png";
 // ==========================
 // Menu and Other UI Images
 // ==========================
-pub const MENU_IMAGE_START: &str = "./img/menu/startMenu.png";
-pub const MENU_IMAGE_MODE: &str = "./img/menu/modosMenu.png";
-pub const IMAGE_PRESSW: &str = "./img/pressW.png";
+pub const MENU_START: &str = "./img/menu/menu_start.png";
+pub const MENU_W: &str = "./img/menu/menu_w.png";

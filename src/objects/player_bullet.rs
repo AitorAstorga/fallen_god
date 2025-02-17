@@ -1,7 +1,8 @@
 use macroquad::prelude::*;
-use crate::assets::SHOT_IMAGE;
+use crate::assets::PLAYER_SHOT;
+use crate::bosses::boss::Boss;
+use crate::objects::objects::CollisionType;
 use crate::objects::bullet::Bullet;
-
 use super::objects::GameObject;
 
 const SHOT_SPEED: f32 = 7.0;
@@ -12,8 +13,13 @@ pub struct PlayerBullet {
 
 impl PlayerBullet {
     pub async fn new() -> Self {
-        let bullet = Bullet::new_texture("player_shot", vec2(1000.0, 1000.0), vec2(0.0, 0.0), vec2(5.0, 5.0), SHOT_IMAGE).await;
+        let bullet = Self::get_initial_bullet().await;
         Self { bullet }
+    }
+
+    pub async fn get_initial_bullet() -> Bullet {
+        let bullet = Bullet::new_texture("player_shot", vec2(1000.0, 1000.0), vec2(0.0, 0.0), vec2(5.0, 5.0), PLAYER_SHOT).await;
+        bullet
     }
     
     pub fn update(&mut self, player_pos: Vec2, mouse_pos: Vec2, _boss_pos: Vec2) {
@@ -31,6 +37,14 @@ impl PlayerBullet {
                 self.bullet.active = false;
                 self.bullet.base.position = vec2(1000.0, 1000.0);
             }
+        }
+    }
+
+    pub async fn process_collision(&mut self, boss: &mut Boss) {
+        if self.as_object().collision_type(boss.as_object()) != CollisionType::None {
+            boss.life -= 1;
+            self.mark_removed();
+            self.bullet = PlayerBullet::get_initial_bullet().await;
         }
     }
     

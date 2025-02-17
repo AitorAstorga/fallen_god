@@ -4,9 +4,40 @@ use crate::assets::*;
 
 // TO DO: Modularise dialogues.
 
+async fn wait_for_enter(texture: Texture2D) {
+    loop {
+        clear_background(BLACK);
+        draw_texture(&texture, 0.0, 0.0, WHITE);
+        next_frame().await;
+        if is_key_pressed(KeyCode::Enter) {
+            break;
+        }
+    }
+}
+
+async fn show_slides_enter(images: &[&str]) {
+    for image_path in images.iter() {
+        let texture = load_texture(image_path).await.unwrap();
+        wait_for_enter(texture).await;
+        // Texture is dropped here before loading the next image.
+    }
+}
+
+async fn show_menu_w() {
+    let press_w = load_texture(MENU_W).await.unwrap();
+    loop {
+        clear_background(BLACK);
+        draw_texture(&press_w, 0.0, 0.0, WHITE);
+        next_frame().await;
+        if is_key_pressed(KeyCode::W) {
+            break;
+        }
+    }
+}
+
 pub async fn show_menu_dialogue() {
     // TO DO: Play menu music
-    let texture = load_texture(MENU_IMAGE_START).await.unwrap();
+    let texture = load_texture(MENU_START).await.unwrap();
     loop {
         clear_background(BLACK);
         draw_texture(&texture, 0.0, 0.0, WHITE);
@@ -22,14 +53,7 @@ pub async fn show_menu_dialogue() {
 pub async fn show_game_over_dialogue() {
     // TO DO: Play menu music
     let texture = load_texture(GAMEOVER_IMAGE).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&texture, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::Enter) {
-            break;
-        }
-    }
+    wait_for_enter(texture).await;
 }
 
 pub async fn show_intro_dialogue() {
@@ -48,18 +72,7 @@ pub async fn show_intro_dialogue() {
         DIALOGUE_INTRO_12,
     ];
     // TO DO: Play menu music
-    for image_path in intro_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-        // Texture is dropped here before loading the next image.
-    }
+    show_slides_enter(&intro_images).await;
 }
 
 pub async fn show_tree_dialogue1() {
@@ -73,27 +86,8 @@ pub async fn show_tree_dialogue1() {
         DIALOGUE_ARBOL1_6,
     ];
     // TO DO: Play menu music
-    for image_path in tree_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    // Show “Press W” screen and wait for W key
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&tree_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_snake_dialogue1() {
@@ -106,26 +100,8 @@ pub async fn show_snake_dialogue1() {
         DIALOGUE_SUGEA1_5,
     ];
     // TO DO: Play menu music
-    for image_path in snake_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&snake_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_octopus_dialogue1() {
@@ -141,26 +117,8 @@ pub async fn show_octopus_dialogue1() {
         DIALOGUE_PULPO1_8,
     ];
     // TO DO: Play menu music
-    for image_path in octopus_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&octopus_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_titan_dialogue1() {
@@ -176,26 +134,8 @@ pub async fn show_titan_dialogue1() {
         DIALOGUE_TITAN1_8,
     ];
     // TO DO: Play menu music
-    for image_path in titan_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&titan_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_tree_dialogue2() {
@@ -206,26 +146,8 @@ pub async fn show_tree_dialogue2() {
         DIALOGUE_ARBOL2_3,
     ];
     // TO DO: Play menu music
-    for image_path in tree2_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&tree2_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_snake_dialogue2() {
@@ -237,26 +159,8 @@ pub async fn show_snake_dialogue2() {
         DIALOGUE_SUGEA2_4,
     ];
     // TO DO: Play menu music
-    for image_path in snake2_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&snake2_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_octopus_dialogue2b() {
@@ -269,26 +173,8 @@ pub async fn show_octopus_dialogue2b() {
         DIALOGUE_PULPO2_5,
     ];
     // TO DO: Play menu music
-    for image_path in octopus2a_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&octopus2a_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_octopus_dialogue2a() {
@@ -297,17 +183,7 @@ pub async fn show_octopus_dialogue2a() {
         DIALOGUE_PULPO2_7,
     ];
     // TO DO: Play menu music
-    for image_path in octopus2b_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
+    show_slides_enter(&octopus2b_images).await;
 }
 
 pub async fn show_titan_dialogue2a() {
@@ -324,26 +200,8 @@ pub async fn show_titan_dialogue2a() {
         DIALOGUE_TITAN2_9,
     ];
     // TO DO: Play menu music
-    for image_path in titan2a_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
-    let press_w = load_texture(IMAGE_PRESSW).await.unwrap();
-    loop {
-        clear_background(BLACK);
-        draw_texture(&press_w, 0.0, 0.0, WHITE);
-        next_frame().await;
-        if is_key_pressed(KeyCode::W) {
-            break;
-        }
-    }
+    show_slides_enter(&titan2a_images).await;
+    show_menu_w().await;
 }
 
 pub async fn show_titan_dialogue2b() {
@@ -357,15 +215,5 @@ pub async fn show_titan_dialogue2b() {
         DIALOGUE_TITAN2_16,
     ];
     // TO DO: Play menu music
-    for image_path in titan2b_images.iter() {
-        let texture = load_texture(image_path).await.unwrap();
-        loop {
-            clear_background(BLACK);
-            draw_texture(&texture, 0.0, 0.0, WHITE);
-            next_frame().await;
-            if is_key_pressed(KeyCode::Enter) {
-                break;
-            }
-        }
-    }
+    show_slides_enter(&titan2b_images).await;
 }

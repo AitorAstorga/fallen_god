@@ -1,3 +1,4 @@
+// src/bosses/boss1.rs
 use macroquad::prelude::*;
 use crate::{
     assets::*,
@@ -11,17 +12,17 @@ use crate::{
 };
 use super::boss::{check_boss_game_state, Boss};
 
-const SCREEN_WIDTH: f32 = 640.0;
-const SCREEN_HEIGHT: f32 = 480.0;
 const BOSS_SHOOT_INTERVAL: f32 = 1.0;
 const BOSS_BULLET_SPEED: f32 = 200.0;
 const BOSS_SHOT_PRECISION: f32 = 0.75;
+const BOSS_LIFE: i32 = 20;
+const PLAYER_LIVES: i32 = 6;
 
 pub async fn boss1() -> GamePhase {
     let map_texture = load_texture(MAP_BOSS1).await.unwrap();
-    let mut boss = Boss::new(vec2(275.0, 195.0), 20, PLAYER_IMAGE_TREE).await;
+    let mut boss = Boss::new(vec2(275.0, 195.0), BOSS_LIFE, BOSS1_IMAGE).await;
     let mut player_bullet = PlayerBullet::new().await;
-    let mut player = Player::new(vec2(32.0, 230.0)).await;
+    let mut player = Player::new(vec2(32.0, 230.0), PLAYER_LIVES).await;
     let heart_texture = load_texture(PLAYER_HEART_IMAGE).await.unwrap();
     let mut boss_bullets: Vec<Bullet> = Vec::new();
     let mut shoot_timer = 0.0;
@@ -46,7 +47,7 @@ pub async fn boss1() -> GamePhase {
             let random_dir = vec2(random_angle.cos(), random_angle.sin());
             let final_dir = (((1.0 - BOSS_SHOT_PRECISION) * random_dir) + (BOSS_SHOT_PRECISION * aim_dir)).normalize_or_zero();
             let bullet_vel = final_dir * BOSS_BULLET_SPEED;
-            boss_bullets.push(Bullet::new_color("boss_bullet", boss.base.position, bullet_vel, 12.0, RED));
+            boss_bullets.push(Bullet::new_texture("boss_bullet", boss.base.position, bullet_vel, vec2(25.0, 25.0), BOSS1_SHOT).await);
         }
         
         // Update boss bullets.
@@ -66,13 +67,7 @@ pub async fn boss1() -> GamePhase {
         }
         invulnerability_timer += dt;
         
-        // Check if the player shot collides with the boss.
-        if player_bullet.as_object().collision_type(&boss.as_object()) != CollisionType::None {
-            boss.life -= 1;
-            player_bullet.mark_removed();
-            // Reset the player bullet to not trigger more collisions.
-            player_bullet = PlayerBullet::new().await;
-        }
+        player_bullet.process_collision(&mut boss).await;
         
         // Draw the scene.
         clear_background(WHITE);
@@ -91,7 +86,7 @@ pub async fn boss1() -> GamePhase {
         
         let state = check_boss_game_state(player.lives, boss.life);
         next_frame().await;
-        if state != GamePhase::Boss1 {
+        if state != GamePhase::Boss {
             return state;
         }
     }

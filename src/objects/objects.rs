@@ -25,6 +25,15 @@ pub enum Appearance {
     Texture(Texture2D),
 }
 
+impl Appearance {
+    pub fn as_texture(&self) -> Option<Texture2D> {
+        match self {
+            Appearance::Texture(tex) => Some(tex.clone()),
+            _ => None,
+        }
+    }
+}
+
 /// (For circles the size.x is used as its radius.)
 pub struct GameObject {
     pub id: &'static str,

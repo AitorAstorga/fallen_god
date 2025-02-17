@@ -31,6 +31,6 @@ pub fn check_boss_game_state(player_lives: i32, boss_life: i32) -> GamePhase {
     } else if boss_life <= 0 {
         GamePhase::Win
     } else {
-        GamePhase::Boss1
+        GamePhase::Boss
     }
 }

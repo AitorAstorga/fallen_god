@@ -17,12 +17,12 @@ pub struct Player {
 }
 
 impl Player {
-    pub async fn new(initial_pos: Vec2) -> Self {
+    pub async fn new(initial_pos: Vec2, lives: i32) -> Self {
         let texture = load_texture(PLAYER_IMAGE_FRONT1).await.unwrap();
-        let base = GameObject::new_with_texture("player", initial_pos, vec2(34.0, 50.0), texture);
+        let base = GameObject::new_with_texture("player", initial_pos, vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), texture);
         Self {
             base,
-            lives: 6,
+            lives: lives,
             dash_timer: 0.0,
             dash_cooldown_timer: 0.0,
             dashing: false,
@@ -39,16 +39,16 @@ impl Player {
         }
         let speed = if self.dashing { PLAYER_BASE_SPEED * DASH_MULTIPLIER } else { PLAYER_BASE_SPEED };
 
-        if is_key_down(KeyCode::D) && self.base.position.x < 580.0 {
+        if is_key_down(KeyCode::D) && self.base.position.x < SCREEN_WIDTH -  PLAYER_SIZE_X {
             self.base.position.x += speed * dt * 60.0;
         }
-        if is_key_down(KeyCode::S) && self.base.position.y < 440.0 {
+        if is_key_down(KeyCode::S) && self.base.position.y < SCREEN_HEIGHT -  PLAYER_SIZE_Y {
             self.base.position.y += speed * dt * 60.0;
         }
-        if is_key_down(KeyCode::A) && self.base.position.x > -5.0 {
+        if is_key_down(KeyCode::A) && self.base.position.x > 0.0 {
             self.base.position.x -= speed * dt * 60.0;
         }
-        if is_key_down(KeyCode::W) && self.base.position.y > 20.0 {
+        if is_key_down(KeyCode::W) && self.base.position.y > 0.0 {
             self.base.position.y -= speed * dt * 60.0;
         }
         
