@@ -38,6 +38,10 @@ impl Bullet {
         }
     }
 
+    pub fn move_to(&mut self, pos: Vec2) {
+        self.base.position = pos;
+    }
+
     pub fn draw(&self) {
         if self.active && !self.removed {
             self.base.draw();
