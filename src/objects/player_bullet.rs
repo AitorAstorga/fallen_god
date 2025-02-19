@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use crate::assets::PLAYER_SHOT;
+use crate::assets::{PLAYER_SHOT, SCREEN_HEIGHT, SCREEN_WIDTH};
 use crate::bosses::boss::Boss;
 use crate::objects::objects::CollisionType;
 use crate::objects::bullet::Bullet;
@@ -30,10 +30,10 @@ impl PlayerBullet {
         }
         if self.bullet.base.active {
             self.bullet.base.position += self.bullet.vel;
-            if self.bullet.base.position.x < -10.0 ||
-               self.bullet.base.position.x > 630.0 ||
-               self.bullet.base.position.y < 10.0 ||
-               self.bullet.base.position.y > 470.0 {
+            if self.bullet.base.position.x < 0.0 ||
+               self.bullet.base.position.x > SCREEN_WIDTH ||
+               self.bullet.base.position.y < 0.0 ||
+               self.bullet.base.position.y > SCREEN_HEIGHT {
                 self.bullet.base.active = false;
                 self.bullet.base.position = vec2(1000.0, 1000.0);
             }
