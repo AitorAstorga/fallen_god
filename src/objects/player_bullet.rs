@@ -23,18 +23,18 @@ impl PlayerBullet {
     }
     
     pub fn update(&mut self, player_pos: Vec2, mouse_pos: Vec2) {
-        if !self.bullet.active && is_mouse_button_pressed(MouseButton::Left) {
+        if !self.bullet.base.active && is_mouse_button_pressed(MouseButton::Left) {
             self.bullet.base.position = player_pos;
             self.bullet.vel = (mouse_pos - player_pos).normalize_or_zero() * SHOT_SPEED;
-            self.bullet.active = true;
+            self.bullet.base.active = true;
         }
-        if self.bullet.active {
+        if self.bullet.base.active {
             self.bullet.base.position += self.bullet.vel;
             if self.bullet.base.position.x < -10.0 ||
                self.bullet.base.position.x > 630.0 ||
                self.bullet.base.position.y < 10.0 ||
                self.bullet.base.position.y > 470.0 {
-                self.bullet.active = false;
+                self.bullet.base.active = false;
                 self.bullet.base.position = vec2(1000.0, 1000.0);
             }
         }
@@ -49,7 +49,7 @@ impl PlayerBullet {
     }
     
     pub fn mark_removed(&mut self) {
-        self.bullet.mark_removed();
+        self.bullet.base.mark_removed();
     }
     
     pub fn as_object(&self) -> &GameObject {
@@ -57,7 +57,7 @@ impl PlayerBullet {
     }
     
     pub fn draw(&self) {
-        if self.bullet.active {
+        if self.bullet.base.active {
             self.bullet.draw();
         }
     }

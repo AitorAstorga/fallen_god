@@ -40,6 +40,8 @@ pub struct GameObject {
     pub position: Vec2,
     pub size: Vec2,
     pub appearance: Appearance,
+    pub active: bool,
+    pub removed: bool,
 }
 
 impl GameObject {
@@ -49,6 +51,8 @@ impl GameObject {
             position,
             size,
             appearance: Appearance::Color { shape, color },
+            active: true,
+            removed: false,
         }
     }
 
@@ -58,27 +62,36 @@ impl GameObject {
             position,
             size,
             appearance: Appearance::Texture(texture),
+            active: true,
+            removed: false,
         }
     }
 
     pub fn draw(&self) {
-        match &self.appearance {
-            Appearance::Color { shape, color } => match shape {
-                Shape::Rectangle => {
-                    draw_rectangle(self.position.x, self.position.y, self.size.x, self.size.y, *color)
-                }
-                Shape::Circle => {
-                    // For a circle, use size.x as the radius.
-                    draw_circle(self.position.x, self.position.y, self.size.x, *color)
-                }
-            },
-            Appearance::Texture(texture) => {
-                draw_texture(texture, self.position.x, self.position.y, WHITE);
-                if DEBUG_HIGHLIGHT {
-                    draw_rectangle(self.position.x, self.position.y, self.size.x, self.size.y, Color::new(255.0, 0.0, 0.0, 0.5));
+        if self.active && !self.removed {
+            match &self.appearance {
+                Appearance::Color { shape, color } => match shape {
+                    Shape::Rectangle => {
+                        draw_rectangle(self.position.x, self.position.y, self.size.x, self.size.y, *color)
+                    }
+                    Shape::Circle => {
+                        // For a circle, use size.x as the radius.
+                        draw_circle(self.position.x, self.position.y, self.size.x, *color)
+                    }
+                },
+                Appearance::Texture(texture) => {
+                    draw_texture(texture, self.position.x, self.position.y, WHITE);
+                    if DEBUG_HIGHLIGHT {
+                        draw_rectangle(self.position.x, self.position.y, self.size.x, self.size.y, Color::new(255.0, 0.0, 0.0, 0.5));
+                    }
                 }
             }
         }
+    }
+
+    pub fn mark_removed(&mut self) {
+        self.removed = true;
+        self.active = false;
     }
 
     /// For a circle a bounding box from its radius (size.x).
@@ -100,6 +113,10 @@ impl GameObject {
     pub fn collision_type(&self, other: &GameObject) -> CollisionType {
         let rect_a = self.bounds();
         let rect_b = other.bounds();
+
+        if !self.active && self.removed {
+            return CollisionType::None;
+        }
 
         if !rect_a.overlaps(&rect_b) {
             return CollisionType::None;

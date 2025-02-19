@@ -72,14 +72,14 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         for bullet in boss_bullets.iter_mut() {
             bullet.update(dt);
         }
-        boss_bullets.retain(|b| !b.removed && !b.is_offscreen(SCREEN_WIDTH, SCREEN_HEIGHT));
+        boss_bullets.retain(|b| !b.base.removed && !b.is_offscreen(SCREEN_WIDTH, SCREEN_HEIGHT));
         
         // Check collisions.
         for bullet in &mut boss_bullets {
             if player.as_object().collision_type(&bullet.as_object()) != CollisionType::None && invulnerability_timer >= 0.1 {
                 player.lives -= 1;
                 invulnerability_timer = 0.0;
-                bullet.mark_removed();
+                bullet.base.mark_removed();
             }
         }
         invulnerability_timer += dt;

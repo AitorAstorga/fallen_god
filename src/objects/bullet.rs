@@ -5,9 +5,7 @@ use super::objects::{GameObject, Shape};
 
 pub struct Bullet {
     pub base: GameObject,
-    pub vel: Vec2,
-    pub active: bool,
-    pub removed: bool,
+    pub vel: Vec2
 }
 
 impl Bullet {
@@ -15,9 +13,7 @@ impl Bullet {
         let base = GameObject::new_with_color(id, pos, vec2(radius, radius), Shape::Circle, color);
         Self {
             base,
-            vel,
-            active: true,
-            removed: false,
+            vel
         }
     }
 
@@ -26,14 +22,12 @@ impl Bullet {
         let base = GameObject::new_with_texture(id, pos, size, texture);
         Self {
             base,
-            vel,
-            active: true,
-            removed: false,
+            vel
         }
     }
 
     pub fn update(&mut self, dt: f32) {
-        if self.active && !self.removed {
+        if self.base.active && !self.base.removed {
             self.base.position += self.vel * dt;
         }
     }
@@ -43,14 +37,7 @@ impl Bullet {
     }
 
     pub fn draw(&self) {
-        if self.active && !self.removed {
-            self.base.draw();
-        }
-    }
-
-    pub fn mark_removed(&mut self) {
-        self.removed = true;
-        self.active = false;
+        self.base.draw();
     }
 
     pub fn is_offscreen(&self, screen_width: f32, screen_height: f32) -> bool {

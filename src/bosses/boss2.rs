@@ -65,12 +65,7 @@ fn follow_player(
     }
 }
 
-async fn update_texture(
-    state: &BossFollowState,
-    shot_texture: &str,
-    normal_texture: &str,
-    collision_limit: i32,
-) -> Texture2D {
+async fn update_texture(state: &BossFollowState, shot_texture: &str, normal_texture: &str, collision_limit: i32) -> Texture2D {
     if state.wall_collision_count >= collision_limit {
         load_texture(normal_texture).await.unwrap()
     } else {

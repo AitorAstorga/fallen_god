@@ -36,14 +36,14 @@ fn move_boss(boss: &mut Boss, time_counter: u32) {
 }
 
 fn update_projectile(proj: &mut Bullet, velocity: Vec2) {
-    if !proj.removed {
+    if !proj.base.removed {
         proj.move_to(proj.as_object().position + velocity);
         if proj.as_object().position.x < 0.0
             || proj.as_object().position.x > SCREEN_WIDTH
             || proj.as_object().position.y < 0.0
             || proj.as_object().position.y > SCREEN_HEIGHT
         {
-            proj.mark_removed();
+            proj.base.mark_removed();
         }
     }
 }
@@ -112,19 +112,19 @@ pub async fn boss4() -> GamePhase {
 
         // Check collision for each boss projectile with the player.
         for proj in [&mut proj1, &mut proj2, &mut proj3].iter_mut() {
-            if !proj.removed
+            if !proj.base.removed
                 && player.as_object().collision_type(&proj.as_object()) != CollisionType::None
                 && invulnerability_timer >= 0.1
             {
                 player.lives -= 1;
                 invulnerability_timer = 0.0;
-                proj.mark_removed();
+                proj.base.mark_removed();
             }
         }
         invulnerability_timer += dt;
 
         // When all three projectiles are removed, reinitialise the formation
-        if proj1.removed && proj2.removed && proj3.removed {
+        if proj1.base.removed && proj2.base.removed && proj3.base.removed {
             let spawn_pos = boss.base.position + vec2(50.0, 30.0);
             proj1 = Bullet::new_texture("boss_proj", spawn_pos, vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
             proj2 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, 30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
