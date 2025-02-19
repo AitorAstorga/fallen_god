@@ -80,7 +80,7 @@ pub async fn boss4() -> GamePhase {
         player.update_sprite().await;
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
-        player_bullet.update(player.base.position, mouse_vec, boss.base.position);
+        player_bullet.update(player.base.position, mouse_vec);
 
         // Initialise the boss shots velocity.
         if formation_velocity.is_none() {

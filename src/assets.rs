@@ -58,6 +58,7 @@ pub const PLAYER_IMAGE_SNAKE2_SHOT: &str = "./img/serpiente2Bola.png";
 pub const PLAYER_SHOT: &str = "./img/player_shot.png";
 pub const BOSS1_SHOT: &str = "./img/boss1/boss1_shot.png";
 pub const BOSS2_SHOT: &str = "./img/boss2/boss2_shot.png";
+pub const BOSS2_B_SHOT: &str = "./img/boss2/boss2_b_shot.png";
 pub const BOSS4_SHOT: &str = "./img/boss4/boss4_shot.png";
 pub const BOSS3_WEAPON: &str = "./img/boss3/boss3_weapon.png";
 pub const BOSS3_B_SHOT: &str = "./img/bolaDmg.png";

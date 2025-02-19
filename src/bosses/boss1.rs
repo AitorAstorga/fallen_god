@@ -41,7 +41,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         player.update_sprite().await;
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
-        player_bullet.update(player.base.position, mouse_vec, boss.base.position);
+        player_bullet.update(player.base.position, mouse_vec);
         
         // Boss shooting logic.
         shoot_timer += dt;
@@ -108,7 +108,6 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         }
     }
 }
-
 
 pub async fn boss1() -> GamePhase {
     let config = BossConfig {

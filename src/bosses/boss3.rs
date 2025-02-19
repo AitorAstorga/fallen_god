@@ -78,7 +78,7 @@ pub async fn boss3() -> GamePhase {
         player.update_sprite().await;
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
-        player_bullet.update(player.base.position, mouse_vec, boss.base.position);
+        player_bullet.update(player.base.position, mouse_vec);
 
         // Update the arm rotation.
         arm_angle += direction as f32 * ARM_SPEED;

@@ -22,7 +22,7 @@ impl PlayerBullet {
         bullet
     }
     
-    pub fn update(&mut self, player_pos: Vec2, mouse_pos: Vec2, _boss_pos: Vec2) {
+    pub fn update(&mut self, player_pos: Vec2, mouse_pos: Vec2) {
         if !self.bullet.active && is_mouse_button_pressed(MouseButton::Left) {
             self.bullet.base.position = player_pos;
             self.bullet.vel = (mouse_pos - player_pos).normalize_or_zero() * SHOT_SPEED;
