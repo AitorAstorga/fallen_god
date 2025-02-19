@@ -1,11 +1,11 @@
 // src/bosses/boss4.rs
 
-use macroquad::prelude::*;
+use macroquad::{conf, prelude::*};
 use crate::{
     assets::*,
     objects::{
         bullet::Bullet,
-        objects::{Appearance, CollisionType},
+        objects::{Appearance, CollisionType, GameObject},
         player::Player,
         player_bullet::PlayerBullet,
     },
@@ -13,9 +13,13 @@ use crate::{
 };
 use super::boss::{check_boss_game_state, Boss};
 
-const BOSS_LIVES: i32 = 20;
 const PLAYER_LIVES: i32 = 6;
-const BOSS_BULLET_SPEED_MULTIPLIER: f32 = 5.0;
+
+pub struct BossConfig {
+    pub life: i32,
+    pub bullet_speed_multiplier: f32,
+    pub mines: i32
+}
 
 fn move_boss(boss: &mut Boss, time_counter: u32) {
     if time_counter > 400 && time_counter < 600 {
@@ -48,10 +52,10 @@ fn update_projectile(proj: &mut Bullet, velocity: Vec2) {
     }
 }
 
-pub async fn boss4() -> GamePhase {
+pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
     // Load map texture and create boss.
     let map_texture = load_texture(MAP_BOSS4).await.unwrap();
-    let mut boss = Boss::new(vec2(500.0, 180.0), BOSS_LIVES, BOSS4_LEFT_IMAGE).await;
+    let mut boss = Boss::new(vec2(500.0, 180.0), config.life, BOSS4_LEFT_IMAGE).await;
 
     // Create player's shot and the player.
     let mut player_bullet = PlayerBullet::new().await;
@@ -71,10 +75,20 @@ pub async fn boss4() -> GamePhase {
     // Timer for player invulnerability.
     let mut invulnerability_timer = 0.0;
 
+    let mut mines : Vec<GameObject> = Vec::new();
+
+    for i in 0..config.mines {
+        let random_x = rand::gen_range(i * (SCREEN_WIDTH as i32 / config.mines), i * (SCREEN_WIDTH as i32 / config.mines) + (SCREEN_WIDTH as i32 / config.mines)) as f32;
+        let random_y = rand::gen_range(0, SCREEN_HEIGHT as i32) as f32;
+        let mine = GameObject::new_with_texture("mine", vec2(random_x, random_y), vec2(23.0, 22.0), load_texture(BOSS3_B_SHOT).await.unwrap());
+        mines.push(mine);
+    }
+
     loop {
         let dt = get_frame_time();
         time_counter = (time_counter + 1) % 2700;
 
+        // --- Update phase ---
         // Update player and player's shot.
         player.update_movement();
         player.update_sprite().await;
@@ -85,7 +99,7 @@ pub async fn boss4() -> GamePhase {
         // Initialise the boss shots velocity.
         if formation_velocity.is_none() {
             let leader_spawn = boss.base.position + vec2(50.0, 30.0);
-            formation_velocity = Some((player.base.position - leader_spawn).normalize() * BOSS_BULLET_SPEED_MULTIPLIER);
+            formation_velocity = Some((player.base.position - leader_spawn).normalize() * config.bullet_speed_multiplier);
         }
         let velocity = formation_velocity.unwrap();
 
@@ -103,6 +117,7 @@ pub async fn boss4() -> GamePhase {
             boss.base.appearance = Appearance::Texture(load_texture(BOSS4_LEFT_IMAGE).await.unwrap());
         }
 
+        // --- Collision detection ---
         // Check collision: if player's shot hits the boss.
         if player_bullet.as_object().collision_type(&boss.as_object()) != CollisionType::None {
             boss.life -= 1;
@@ -123,6 +138,15 @@ pub async fn boss4() -> GamePhase {
         }
         invulnerability_timer += dt;
 
+        if config.mines > 0 {
+            for mine in mines.iter_mut() {
+                if mine.collision_type(player.as_object()) != CollisionType::None {
+                    player.lives -= 1;
+                    mine.mark_removed();
+                }
+            }
+        }
+
         // When all three projectiles are removed, reinitialise the formation
         if proj1.base.removed && proj2.base.removed && proj3.base.removed {
             let spawn_pos = boss.base.position + vec2(50.0, 30.0);
@@ -132,7 +156,7 @@ pub async fn boss4() -> GamePhase {
             formation_velocity = None;
         }
 
-        // Draw the scene.
+        // --- Draw phase ---
         clear_background(WHITE);
         draw_texture(&map_texture, 0.0, 0.0, WHITE);
         boss.draw();
@@ -145,10 +169,26 @@ pub async fn boss4() -> GamePhase {
             draw_texture(&heart_texture, i as f32 * 40.0, 0.0, WHITE);
         }
 
+        if config.mines > 0 {
+            for mine in mines.iter() {
+                mine.draw();
+                println!("{:?}", mine.collision_type(player.as_object()));
+            }
+        }
+
         let state = check_boss_game_state(player.lives, boss.life);
         next_frame().await;
         if state != GamePhase::Boss {
             return state;
         }
     }
+}
+
+pub async fn boss4() -> GamePhase {
+    let config = BossConfig {
+        life: 20,
+        bullet_speed_multiplier: 5.0,
+        mines: 0
+    };
+    run_boss_battle(config).await
 }

@@ -6,7 +6,7 @@ pub async fn boss3_b() -> GamePhase {
     let config = BossConfig {
         life: 20,
         speed: 0.0115,
-        mines: true
+        mines: 25
     };
     run_boss_battle(config).await
 }

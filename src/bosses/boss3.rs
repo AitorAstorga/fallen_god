@@ -6,7 +6,7 @@ use crate::{
     assets::*,
     objects::{
         objects::{CollisionType, GameObject},
-        player::{self, Player},
+        player::Player,
         player_bullet::PlayerBullet,
     },
     types::GamePhase,
@@ -18,10 +18,9 @@ const ARM_RADIUS: f32 = 400.0;
 const SEGMENT_DIAMETER: f32 = 26.0;
 
 pub struct BossConfig {
-    // Boss A configuration.
     pub life: i32,
     pub speed: f32,
-    pub mines: bool
+    pub mines: i32
 }
 
 fn move_arm(arm_center: Vec2, arm_angle: f32, arm_radius: f32, segments: &mut Vec<GameObject>) {
@@ -79,8 +78,8 @@ pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
 
     let mut mines : Vec<GameObject> = Vec::new();
 
-    for i in 0..25 {
-        let random_x = rand::gen_range(i * (SCREEN_WIDTH as i32 / 26), i * (SCREEN_WIDTH as i32 / 26) + (SCREEN_WIDTH as i32 / 26)) as f32;
+    for i in 0..config.mines {
+        let random_x = rand::gen_range(i * (SCREEN_WIDTH as i32 / config.mines), i * (SCREEN_WIDTH as i32 / config.mines) + (SCREEN_WIDTH as i32 / config.mines)) as f32;
         let random_y = rand::gen_range(0, SCREEN_HEIGHT as i32) as f32;
         let mine = GameObject::new_with_texture("mine", vec2(random_x, random_y), vec2(23.0, 22.0), load_texture(BOSS3_B_SHOT).await.unwrap());
         mines.push(mine);
@@ -120,7 +119,7 @@ pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
         }
         invulnerability_timer += dt;
 
-        if config.mines {
+        if config.mines > 0 {
             for mine in mines.iter_mut() {
                 if mine.collision_type(player.as_object()) != CollisionType::None {
                     player.lives -= 1;
@@ -139,7 +138,7 @@ pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
         player_bullet.draw();
         draw_arm(arm_center, arm_angle, arm_radius, &mut segments );
         
-        if config.mines {
+        if config.mines > 0 {
             for mine in mines.iter() {
                 mine.draw();
                 println!("{:?}", mine.collision_type(player.as_object()));
@@ -163,7 +162,7 @@ pub async fn boss3() -> GamePhase {
     let config = BossConfig {
         life: 20,
         speed: 0.0115,
-        mines: false
+        mines: 0
     };
     run_boss_battle(config).await
 }
