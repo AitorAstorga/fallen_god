@@ -1,5 +1,3 @@
-use std::i32::MAX;
-
 // src/bosses/boss3.rs
 use macroquad::prelude::*;
 use crate::{
@@ -17,10 +15,11 @@ const PLAYER_LIVES: i32 = 6;
 const ARM_RADIUS: f32 = 400.0;
 const SEGMENT_DIAMETER: f32 = 26.0;
 
-pub struct BossConfig {
+pub struct BossConfig<'a> {
     pub life: i32,
     pub speed: f32,
-    pub mines: i32
+    pub mines: i32,
+    pub boss_image_path: &'a str,
 }
 
 fn move_arm(arm_center: Vec2, arm_angle: f32, arm_radius: f32, segments: &mut Vec<GameObject>) {
@@ -51,13 +50,13 @@ fn draw_arm(arm_center: Vec2, arm_angle: f32, arm_radius: f32, segments: &mut Ve
     }
 }
 
-pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
+pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
     // Load assets.
     let map_texture = load_texture(MAP_BOSS3).await.unwrap();
     let heart_texture = load_texture(PLAYER_HEART_IMAGE).await.unwrap();
 
     // Create the boss centered on screen.
-    let mut boss = Boss::new( vec2(SCREEN_WIDTH / 2.0 - 48.0, SCREEN_HEIGHT / 2.0 - 48.0), config.life, BOSS3_IMAGE).await;
+    let mut boss = Boss::new( vec2(SCREEN_WIDTH / 2.0 - 48.0, SCREEN_HEIGHT / 2.0 - 48.0), config.life, config.boss_image_path).await;
     // Create the player's bullet and player.
     let mut player_bullet = PlayerBullet::new().await;
     let mut player = Player::new(vec2(32.0, 230.0), PLAYER_LIVES).await;
@@ -141,7 +140,6 @@ pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
         if config.mines > 0 {
             for mine in mines.iter() {
                 mine.draw();
-                println!("{:?}", mine.collision_type(player.as_object()));
             }
         }
 
@@ -162,7 +160,8 @@ pub async fn boss3() -> GamePhase {
     let config = BossConfig {
         life: 20,
         speed: 0.0115,
-        mines: 0
+        mines: 0,
+        boss_image_path: BOSS3_IMAGE
     };
     run_boss_battle(config).await
 }

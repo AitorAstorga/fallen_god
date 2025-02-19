@@ -15,10 +15,13 @@ use super::boss::{check_boss_game_state, Boss};
 
 const PLAYER_LIVES: i32 = 6;
 
-pub struct BossConfig {
+pub struct BossConfig<'a> {
     pub life: i32,
     pub bullet_speed_multiplier: f32,
-    pub mines: i32
+    pub mines: i32,
+    pub boss_image_left_path: &'a str,
+    pub boss_image_right_path: &'a str,
+    pub map_path: &'a str
 }
 
 fn move_boss(boss: &mut Boss, time_counter: u32) {
@@ -52,10 +55,10 @@ fn update_projectile(proj: &mut Bullet, velocity: Vec2) {
     }
 }
 
-pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
+pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
     // Load map texture and create boss.
-    let map_texture = load_texture(MAP_BOSS4).await.unwrap();
-    let mut boss = Boss::new(vec2(500.0, 180.0), config.life, BOSS4_LEFT_IMAGE).await;
+    let map_texture = load_texture(config.map_path).await.unwrap();
+    let mut boss = Boss::new(vec2(500.0, 180.0), config.life, config.boss_image_left_path).await;
 
     // Create player's shot and the player.
     let mut player_bullet = PlayerBullet::new().await;
@@ -112,9 +115,9 @@ pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
 
         // Update boss sprite based on player's position.
         if boss.base.position.x > player.base.position.x {
-            boss.base.appearance = Appearance::Texture(load_texture(BOSS4_RIGHT_IMAGE).await.unwrap());
+            boss.base.appearance = Appearance::Texture(load_texture(config.boss_image_right_path).await.unwrap());
         } else {
-            boss.base.appearance = Appearance::Texture(load_texture(BOSS4_LEFT_IMAGE).await.unwrap());
+            boss.base.appearance = Appearance::Texture(load_texture(config.boss_image_left_path).await.unwrap());
         }
 
         // --- Collision detection ---
@@ -172,7 +175,6 @@ pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
         if config.mines > 0 {
             for mine in mines.iter() {
                 mine.draw();
-                println!("{:?}", mine.collision_type(player.as_object()));
             }
         }
 
@@ -188,7 +190,10 @@ pub async fn boss4() -> GamePhase {
     let config = BossConfig {
         life: 20,
         bullet_speed_multiplier: 5.0,
-        mines: 0
+        mines: 0,
+        boss_image_left_path: BOSS4_LEFT_IMAGE,
+        boss_image_right_path: BOSS4_RIGHT_IMAGE,
+        map_path: MAP_BOSS4
     };
     run_boss_battle(config).await
 }

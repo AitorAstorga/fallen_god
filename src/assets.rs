@@ -49,9 +49,6 @@ pub const BOSS4_LEFT_IMAGE: &str = "./img/boss4/boss4_left.png";
 pub const BOSS4_RIGHT_IMAGE: &str = "./img/boss4/boss4_right.png";
 pub const BOSS4_B_LEFT_IMAGE: &str = "./img/boss4/boss4_b_left.png";
 pub const BOSS4_B_RIGHT_IMAGE: &str = "./img/boss4/boss4_b_right.png";
-pub const PLAYER_IMAGE_TREE2: &str = "./img/arbol2.png";
-pub const PLAYER_IMAGE_SNAKE2: &str = "./img/serpiente2.png";
-pub const PLAYER_IMAGE_SNAKE2_SHOT: &str = "./img/serpiente2Bola.png";
 
 // ==========================
 // Shots and Weapons
@@ -63,10 +60,6 @@ pub const BOSS2_B_SHOT: &str = "./img/boss2/boss2_b_shot.png";
 pub const BOSS4_SHOT: &str = "./img/boss4/boss4_shot.png";
 pub const BOSS3_WEAPON: &str = "./img/boss3/boss3_weapon.png";
 pub const BOSS3_B_SHOT: &str = "./img/boss3/boss3_b_shot.png";
-pub const PLAYER_SHOT_BOSS: &str = "./img/bolaSua.png";
-pub const BOSS_IMAGE: &str = "./img/Boss.png";
-pub const BOSS_RIGHT_IMAGE: &str = "./img/bossb.png";
-pub const BOSS_RIGHT2_IMAGE: &str = "./img/Boss2.png";
 pub const GAMEOVER_IMAGE: &str = "./img/gameOver.png";
 
 // ==========================
