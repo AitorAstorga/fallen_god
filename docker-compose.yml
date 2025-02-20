@@ -1,0 +1,7 @@
+services:
+  web:
+    container_name: fallen-god
+    image: ghcr.io/aitorastorga/aichan-fallen-god:latest
+    ports:
+      - "YOUR_PORT:80"
+    restart: unless-stopped
