@@ -3,7 +3,7 @@
 use macroquad::prelude::*;
 
 // Activate collision box highlighting.
-const DEBUG_HIGHLIGHT: bool = true;
+const DEBUG_HIGHLIGHT: bool = false;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum CollisionType {

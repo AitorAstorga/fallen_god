@@ -17,8 +17,7 @@ impl Bullet {
         }
     }
 
-    pub async fn new_texture(id: &'static str, pos: Vec2, vel: Vec2, size: Vec2, texture_path: &str) -> Self {
-        let texture = load_texture(texture_path).await.unwrap();
+    pub async fn new_texture(id: &'static str, pos: Vec2, vel: Vec2, size: Vec2, texture: Texture2D) -> Self {
         let base = GameObject::new_with_texture(id, pos, size, texture);
         Self {
             base,

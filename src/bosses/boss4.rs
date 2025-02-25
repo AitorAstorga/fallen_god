@@ -1,6 +1,6 @@
 // src/bosses/boss4.rs
 
-use macroquad::{conf, prelude::*};
+use macroquad::prelude::*;
 use crate::{
     assets::*,
     objects::{
@@ -15,13 +15,13 @@ use super::boss::{check_boss_game_state, Boss};
 
 const PLAYER_LIVES: i32 = 6;
 
-pub struct BossConfig<'a> {
+pub struct BossConfig {
     pub life: i32,
     pub bullet_speed_multiplier: f32,
     pub mines: i32,
-    pub boss_image_left_path: &'a str,
-    pub boss_image_right_path: &'a str,
-    pub map_path: &'a str
+    pub boss_texture_left: Texture2D,
+    pub boss_texture_right: Texture2D,
+    pub map_texture: Texture2D
 }
 
 fn move_boss(boss: &mut Boss, time_counter: u32) {
@@ -55,21 +55,24 @@ fn update_projectile(proj: &mut Bullet, velocity: Vec2) {
     }
 }
 
-pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
+pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
     // Load map texture and create boss.
-    let map_texture = load_texture(config.map_path).await.unwrap();
-    let mut boss = Boss::new(vec2(500.0, 180.0), config.life, config.boss_image_left_path).await;
+    let map_texture = config.map_texture;
+    let player_bullet_texture = load_texture(PLAYER_SHOT).await.unwrap();
+    let boss_bullet_texture = load_texture(BOSS4_SHOT).await.unwrap();
+
+    let mut boss = Boss::new(vec2(500.0, 180.0), config.life, config.boss_texture_left.clone()).await;
 
     // Create player's shot and the player.
-    let mut player_bullet = PlayerBullet::new().await;
+    let mut player_bullet = PlayerBullet::new(player_bullet_texture.clone()).await;
     let mut player = Player::new(vec2(32.0, 230.0), PLAYER_LIVES).await;
     let heart_texture = load_texture(PLAYER_HEART_IMAGE).await.unwrap();
 
     // Create boss bullets in a formation.
     let spawn_pos = boss.base.position + vec2(50.0, 30.0);
-    let mut proj1 = Bullet::new_texture("boss_proj", spawn_pos, vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
-    let mut proj2 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, 30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
-    let mut proj3 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, -30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
+    let mut proj1 = Bullet::new_texture("boss_proj", spawn_pos, vec2(0.0, 0.0), vec2(32.0 , 32.0 ), boss_bullet_texture.clone()).await;
+    let mut proj2 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, 30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), boss_bullet_texture.clone()).await;
+    let mut proj3 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, -30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), boss_bullet_texture.clone()).await;
     // We'll compute a single common velocity for the formation.
     let mut formation_velocity: Option<Vec2> = None;
 
@@ -87,6 +90,9 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         mines.push(mine);
     }
 
+    let boss_left_texture = config.boss_texture_left;
+    let boss_right_texture = config.boss_texture_right;
+
     loop {
         let dt = get_frame_time();
         time_counter = (time_counter + 1) % 2700;
@@ -94,7 +100,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         // --- Update phase ---
         // Update player and player's shot.
         player.update_movement();
-        player.update_sprite().await;
+        player.update_sprite();
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
         player_bullet.update(player.base.position, mouse_vec);
@@ -115,9 +121,9 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
 
         // Update boss sprite based on player's position.
         if boss.base.position.x > player.base.position.x {
-            boss.base.appearance = Appearance::Texture(load_texture(config.boss_image_right_path).await.unwrap());
+            boss.base.appearance = Appearance::Texture(boss_right_texture.clone());
         } else {
-            boss.base.appearance = Appearance::Texture(load_texture(config.boss_image_left_path).await.unwrap());
+            boss.base.appearance = Appearance::Texture(boss_left_texture.clone());
         }
 
         // --- Collision detection ---
@@ -125,7 +131,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         if player_bullet.as_object().collision_type(&boss.as_object()) != CollisionType::None {
             boss.life -= 1;
             player_bullet.mark_removed();
-            player_bullet = PlayerBullet::new().await;
+            player_bullet = PlayerBullet::new(player_bullet_texture.clone()).await;
         }
 
         // Check collision for each boss projectile with the player.
@@ -153,9 +159,9 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         // When all three projectiles are removed, reinitialise the formation
         if proj1.base.removed && proj2.base.removed && proj3.base.removed {
             let spawn_pos = boss.base.position + vec2(50.0, 30.0);
-            proj1 = Bullet::new_texture("boss_proj", spawn_pos, vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
-            proj2 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, 30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
-            proj3 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, -30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), BOSS4_SHOT).await;
+            proj1 = Bullet::new_texture("boss_proj", spawn_pos, vec2(0.0, 0.0), vec2(32.0 , 32.0 ), boss_bullet_texture.clone()).await;
+            proj2 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, 30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), boss_bullet_texture.clone()).await;
+            proj3 = Bullet::new_texture("boss_proj", spawn_pos + vec2(30.0, -30.0), vec2(0.0, 0.0), vec2(32.0 , 32.0 ), boss_bullet_texture.clone()).await;
             formation_velocity = None;
         }
 
@@ -191,9 +197,9 @@ pub async fn boss4() -> GamePhase {
         life: 20,
         bullet_speed_multiplier: 5.0,
         mines: 0,
-        boss_image_left_path: BOSS4_LEFT_IMAGE,
-        boss_image_right_path: BOSS4_RIGHT_IMAGE,
-        map_path: MAP_BOSS4
+        boss_texture_left: load_texture(BOSS4_LEFT_IMAGE).await.unwrap(),
+        boss_texture_right: load_texture(BOSS4_RIGHT_IMAGE).await.unwrap(),
+        map_texture: load_texture(MAP_BOSS4).await.unwrap()
     };
     run_boss_battle(config).await
 }

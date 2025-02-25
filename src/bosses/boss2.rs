@@ -65,43 +65,44 @@ fn follow_player(
     }
 }
 
-async fn update_texture(state: &BossFollowState, shot_texture: &str, normal_texture: &str, collision_limit: i32) -> Texture2D {
+async fn update_texture(state: &BossFollowState, boss_shot: Texture2D, boss_normal: Texture2D, collision_limit: i32) -> Texture2D {
     if state.wall_collision_count >= collision_limit {
-        load_texture(normal_texture).await.unwrap()
+        boss_normal
     } else {
-        load_texture(shot_texture).await.unwrap()
+        boss_shot
     }
 }
 
-pub struct BossConfig<'a> { 
+pub struct BossConfig { 
     // Common boss properties.
     pub collision_limit: i32,
 
     // Boss A configuration.
     pub boss_a_life: i32,
     pub boss_a_initial_position: Vec2,
-    pub boss_a_shot_texture: &'a str,
-    pub boss_a_normal_texture: &'a str,
+    pub boss_a_shot_texture: Texture2D,
+    pub boss_a_normal_texture: Texture2D,
     pub boss_a_speed: f32,
 
     // Boss B configuration (optional).
     pub boss_b_life: Option<i32>,
     pub boss_b_initial_position: Option<Vec2>,
-    pub boss_b_shot_texture: Option<&'a str>,
-    pub boss_b_normal_texture: Option<&'a str>,
+    pub boss_b_shot_texture: Option<Texture2D>,
+    pub boss_b_normal_texture: Option<Texture2D>,
     pub boss_b_speed: Option<f32>,
 }
 
-pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
+pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
     // Load common textures.
     let map_texture = load_texture(MAP_BOSS2).await.unwrap();
+    let player_bullet_texture = load_texture(PLAYER_SHOT).await.unwrap();
     let heart_texture = load_texture(PLAYER_HEART_IMAGE).await.unwrap();
 
     // Create Boss A.
     let mut boss_a = Boss::new(
         config.boss_a_initial_position,
         config.boss_a_life,
-        config.boss_a_shot_texture,
+        config.boss_a_shot_texture.clone(),
     )
     .await;
     let boss_a_speed = config.boss_a_speed;
@@ -118,7 +119,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
     ) = (
         config.boss_b_life,
         config.boss_b_initial_position,
-        config.boss_b_shot_texture,
+        config.boss_b_shot_texture.clone(),
     ) {
         let boss_b = Boss::new(b_initial_pos, b_life, b_shot).await;
         (Some(boss_b), Some(BossFollowState::new()))
@@ -128,7 +129,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
 
     // Create player and player's bullet.
     let mut player = Player::new(vec2(32.0, 230.0), 6).await;
-    let mut player_bullet = PlayerBullet::new().await;
+    let mut player_bullet = PlayerBullet::new(player_bullet_texture.clone()).await;
 
     // Timers for invulnerability and state resets.
     let mut invulnerability_timer = 0.0;
@@ -139,7 +140,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
 
         // --- Update phase ---
         player.update_movement();
-        player.update_sprite().await;
+        player.update_sprite();
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
 
@@ -161,7 +162,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         // Process collision for Boss A if it’s still alive.
         if boss_a.life > 0 && player_bullet.as_object().collision_type(&boss_a.as_object()) != CollisionType::None {
             player_bullet.mark_removed();
-            player_bullet = PlayerBullet::new().await;
+            player_bullet = PlayerBullet::new(player_bullet_texture.clone()).await;
             if state_a.wall_collision_count == collision_limit {
                 boss_a.life -= 1;
                 if boss_a.life < 0 {
@@ -174,7 +175,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         if let (Some(ref mut boss), Some(state)) = (boss_b.as_mut(), state_b.as_ref()) {
             if boss.life > 0 && player_bullet.as_object().collision_type(&boss.as_object()) != CollisionType::None {
                 player_bullet.mark_removed();
-                player_bullet = PlayerBullet::new().await;
+                player_bullet = PlayerBullet::new(player_bullet_texture.clone()).await;
                 if state.wall_collision_count == collision_limit {
                     boss.life -= 1;
                     if boss.life < 0 {
@@ -209,12 +210,12 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         }
 
         // --- Update textures based on collision state ---
-        let new_tex_a = update_texture(&state_a, boss_a_shot, boss_a_normal, collision_limit).await;
+        let new_tex_a = update_texture(&state_a, boss_a_shot.clone(), boss_a_normal.clone(), collision_limit).await;
         boss_a.base.appearance = Appearance::Texture(new_tex_a);
         if let (Some(ref mut boss), Some(state)) = (boss_b.as_mut(), state_b.as_ref()) {
-            let boss_b_shot = config.boss_b_shot_texture.unwrap();
-            let boss_b_normal = config.boss_b_normal_texture.unwrap();
-            let new_tex_b = update_texture(state, boss_b_shot, boss_b_normal, collision_limit).await;
+            let boss_b_shot = config.boss_b_shot_texture.clone().unwrap();
+            let boss_b_normal = config.boss_b_normal_texture.clone().unwrap();
+            let new_tex_b = update_texture(state, boss_b_shot.clone(), boss_b_normal, collision_limit).await;
             boss.base.appearance = Appearance::Texture(new_tex_b);
         }
 
@@ -260,8 +261,8 @@ pub async fn boss2() -> GamePhase {
         collision_limit: 5,
         boss_a_life: 20,
         boss_a_initial_position: vec2(500.0, 225.0),
-        boss_a_shot_texture: BOSS2_SHOT,
-        boss_a_normal_texture: BOSS2_IMAGE,
+        boss_a_shot_texture: load_texture(BOSS2_SHOT).await.unwrap(),
+        boss_a_normal_texture: load_texture(BOSS2_IMAGE).await.unwrap(),
         boss_a_speed: 4.0,
         // For a single-boss battle, leave Boss B as None.
         boss_b_life: None,

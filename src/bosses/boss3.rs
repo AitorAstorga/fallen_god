@@ -15,11 +15,11 @@ const PLAYER_LIVES: i32 = 6;
 const ARM_RADIUS: f32 = 400.0;
 const SEGMENT_DIAMETER: f32 = 26.0;
 
-pub struct BossConfig<'a> {
+pub struct BossConfig {
     pub life: i32,
     pub speed: f32,
     pub mines: i32,
-    pub boss_image_path: &'a str,
+    pub boss_texture: Texture2D,
 }
 
 fn move_arm(arm_center: Vec2, arm_angle: f32, arm_radius: f32, segments: &mut Vec<GameObject>) {
@@ -50,15 +50,16 @@ fn draw_arm(arm_center: Vec2, arm_angle: f32, arm_radius: f32, segments: &mut Ve
     }
 }
 
-pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
+pub async fn run_boss_battle(config: BossConfig) -> GamePhase {
     // Load assets.
     let map_texture = load_texture(MAP_BOSS3).await.unwrap();
+    let player_bullet_texture = load_texture(PLAYER_SHOT).await.unwrap();
     let heart_texture = load_texture(PLAYER_HEART_IMAGE).await.unwrap();
 
     // Create the boss centered on screen.
-    let mut boss = Boss::new( vec2(SCREEN_WIDTH / 2.0 - 48.0, SCREEN_HEIGHT / 2.0 - 48.0), config.life, config.boss_image_path).await;
+    let mut boss = Boss::new( vec2(SCREEN_WIDTH / 2.0 - 48.0, SCREEN_HEIGHT / 2.0 - 48.0), config.life, config.boss_texture).await;
     // Create the player's bullet and player.
-    let mut player_bullet = PlayerBullet::new().await;
+    let mut player_bullet = PlayerBullet::new(player_bullet_texture).await;
     let mut player = Player::new(vec2(32.0, 230.0), PLAYER_LIVES).await;
 
     // arm_center is where the boss’s rotating arm is anchored.
@@ -89,7 +90,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
 
         // --- Update phase ---
         player.update_movement();
-        player.update_sprite().await;
+        player.update_sprite();
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
         player_bullet.update(player.base.position, mouse_vec);
@@ -161,7 +162,7 @@ pub async fn boss3() -> GamePhase {
         life: 20,
         speed: 0.0115,
         mines: 0,
-        boss_image_path: BOSS3_IMAGE
+        boss_texture: load_texture(BOSS3_IMAGE).await.unwrap()
     };
     run_boss_battle(config).await
 }

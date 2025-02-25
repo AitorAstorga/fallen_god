@@ -1,4 +1,5 @@
 // src/bosses/boss1_b.rs
+use macroquad::texture::load_texture;
 use crate::{
     assets::*,
     types::GamePhase,
@@ -14,8 +15,8 @@ pub async fn boss1_b() -> GamePhase {
         life: 20,
         extra_bullet: true,
         map_texture_path: MAP_BOSS1,
-        boss_image_path: BOSS1_B_IMAGE,
-        boss_shot_sound: BOSS1_SHOT,
+        boss_texture: load_texture(BOSS1_B_IMAGE).await.unwrap(),
+        boss_shot_texture: load_texture(BOSS1_SHOT).await.unwrap()
     };
     run_boss_battle(config).await
 }

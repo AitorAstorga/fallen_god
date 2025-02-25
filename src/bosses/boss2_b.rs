@@ -13,14 +13,14 @@ pub async fn boss2_b() -> GamePhase {
         boss_a_life: 20,
         // Boss A configuration.
         boss_a_initial_position: vec2(500.0, 225.0),
-        boss_a_shot_texture: BOSS2_SHOT,
-        boss_a_normal_texture: BOSS2_IMAGE,
+        boss_a_shot_texture: load_texture(BOSS2_SHOT).await.unwrap(),
+        boss_a_normal_texture: load_texture(BOSS2_IMAGE).await.unwrap(),
         boss_a_speed: 4.0,
         // Boss B configuration.
         boss_b_life: Some(20),
         boss_b_initial_position: Some(vec2(500.0, 125.0)),
-        boss_b_shot_texture: Some(BOSS2_B_SHOT),
-        boss_b_normal_texture: Some(BOSS2_B_IMAGE),
+        boss_b_shot_texture: Some(load_texture(BOSS2_B_SHOT).await.unwrap()),
+        boss_b_normal_texture: Some(load_texture(BOSS2_B_IMAGE).await.unwrap()),
         boss_b_speed: Some(5.0),
     };
     run_boss_battle(config).await

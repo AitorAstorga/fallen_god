@@ -10,8 +10,8 @@ pub struct Boss {
 }
 
 impl Boss {
-    pub async fn new(pos: Vec2, life: i32, texture_path: &str) -> Self {
-        let texture = load_texture(texture_path).await.unwrap();
+    pub async fn new(pos: Vec2, life: i32, texture: Texture2D) -> Self {
+        let texture = texture;
         let base = GameObject::new_with_texture("boss", pos, vec2(96.0, 96.0), texture);
         Self { base, life }
     }

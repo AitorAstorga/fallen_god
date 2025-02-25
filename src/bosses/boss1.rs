@@ -19,14 +19,15 @@ pub struct BossConfig<'a> {
     pub life: i32,
     pub extra_bullet: bool,
     pub map_texture_path: &'a str,
-    pub boss_image_path: &'a str,
-    pub boss_shot_sound: &'a str,
+    pub boss_texture: Texture2D,
+    pub boss_shot_texture: Texture2D,
 }
 
 pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
     let map_texture = load_texture(config.map_texture_path).await.unwrap();
-    let mut boss = Boss::new(vec2(275.0, 195.0), config.life, config.boss_image_path).await;
-    let mut player_bullet = PlayerBullet::new().await;
+    let player_bullet_texture = load_texture(PLAYER_SHOT).await.unwrap();
+    let mut boss = Boss::new(vec2(275.0, 195.0), config.life, config.boss_texture).await;
+    let mut player_bullet = PlayerBullet::new(player_bullet_texture).await;
     let mut player = Player::new(vec2(32.0, 230.0), 6).await;
     let heart_texture = load_texture(PLAYER_HEART_IMAGE).await.unwrap();
     let mut boss_bullets: Vec<Bullet> = Vec::new();
@@ -38,7 +39,7 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
         
         // Update player and shot.
         player.update_movement();
-        player.update_sprite().await;
+        player.update_sprite();
         let (mx, my) = mouse_position();
         let mouse_vec = vec2(mx, my);
         player_bullet.update(player.base.position, mouse_vec);
@@ -55,14 +56,14 @@ pub async fn run_boss_battle(config: BossConfig<'_>) -> GamePhase {
             
             // Always fire the basic bullet.
             boss_bullets.push(
-                Bullet::new_texture("boss_bullet", boss.base.position, bullet_vel, vec2(25.0, 25.0), config.boss_shot_sound)
+                Bullet::new_texture("boss_bullet", boss.base.position, bullet_vel, vec2(25.0, 25.0), config.boss_shot_texture.clone())
                     .await
             );
             
             // For bosses that need an extra bullet (like boss1_b).
             if config.extra_bullet {
                 boss_bullets.push(
-                    Bullet::new_texture("boss_bullet", boss.base.position, bullet_vel * 2.0, vec2(25.0, 25.0), config.boss_shot_sound)
+                    Bullet::new_texture("boss_bullet", boss.base.position, bullet_vel * 2.0, vec2(25.0, 25.0), config.boss_shot_texture.clone())
                         .await
                 );
             }
@@ -117,8 +118,8 @@ pub async fn boss1() -> GamePhase {
         life: 20,
         extra_bullet: false,
         map_texture_path: MAP_BOSS1,
-        boss_image_path: BOSS1_IMAGE,
-        boss_shot_sound: BOSS1_SHOT,
+        boss_texture: load_texture(BOSS1_IMAGE).await.unwrap(),
+        boss_shot_texture: load_texture(BOSS1_SHOT).await.unwrap()
     };
     run_boss_battle(config).await
 }
